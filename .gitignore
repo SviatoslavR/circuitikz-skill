@@ -1,0 +1,14 @@
+*.aux
+*.log
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.toc
+*.out
+*.pdf
+*.bbl
+*.blg
+
+.DS_Store
+.vscode/
+*.swp

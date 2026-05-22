@@ -1,0 +1,97 @@
+\documentclass[border=10pt]{standalone}
+\usepackage[american]{circuitikz}
+
+\begin{document}
+\begin{circuitikz}[thick, scale=1.0, transform shape]
+
+    % ==========================================
+    % Phase 1: Component Placement
+    % ==========================================
+    
+    % --- Left Inverter Stack ---
+    \node[pmos, xscale=-1, emptycircle] (PUL) at (-2, 3) {};   % Left Top PMOS
+    \node[nmos, emptycircle] (NSL) at (-2, 0) {};              % Left Mid NMOS
+    \node[nmos, xscale=-1, emptycircle] (PDL) at (-2, -3) {};  % Left Bot NMOS
+    
+    % --- Right Inverter Stack ---
+    \node[pmos, emptycircle] (PUR) at (2, 3) {};               % Right Top PMOS
+    \node[nmos, xscale=-1, emptycircle] (NSR) at (2, 0) {};    % Right Mid NMOS
+    \node[nmos, emptycircle] (PDR) at (2, -3) {};              % Right Bot NMOS
+
+    % --- Pass Gates ---
+    \node[nmos, rotate=-90, emptycircle] (WPGL) at (-3.4, 1.5) {}; % Write Pass Gate Left
+    \node[nmos, xscale=-1, rotate=-90, emptycircle] (WPGR) at (3.4, 1.5) {}; % Write Pass Gate Right
+    \node[nmos, xscale=-1, rotate=90, emptycircle] (RPG) at (4.6, -1.5) {};  % Read Pass Gate
+
+    % ==========================================
+    % Phase 2: Connectivity & Wiring
+    % ==========================================
+
+    % --- Internal Vertical Wiring ---
+    \draw (PUL.D) -- (NSL.D) coordinate[midway] (Q);   % Connect PUL to NSL
+    \draw (NSL.S) -- (PDL.D) coordinate[midway] (NQ);  % Connect NSL to PDL
+    \draw (PUR.D) -- (NSR.D) coordinate[midway] (QB);  % Connect PUR to NSR
+    \draw (NSR.S) -- (PDR.D) coordinate[midway] (NQB); % Connect NSR to PDR
+
+    % --- Cross Coupling ---
+    \draw (Q) -- (-2, 1.5) -- (0.2, 1.0) node[circ] {};  % Q to NSR/PDL gate
+    \draw (QB) -- (2, 1.5) -- (-0.2, 2.0) node[circ] {}; % QB to NSL/PUL gate
+
+    % --- Inverter Gate Connections ---
+    \draw (PUL.G) -- (-0.2, 3) -- (-0.2, -3) -- (PDL.G); % Left Inverter Gate link
+    \draw (PUR.G) -- (0.2, 3) -- (0.2, -3) -- (PDR.G);   % Right Inverter Gate link
+
+    % --- Power and Ground ---
+    \draw (PUL.S) -- (-2, 4.2); % VDD rail stem left
+    \draw (-2.5, 4.2) -- (-1.5, 4.2); % VDD rail left
+    \draw (PUR.S) -- (2, 4.2); % VDD rail stem right
+    \draw (1.5, 4.2) -- (2.5, 4.2); % VDD rail right
+    \draw (PDL.S) node[ground] {}; % Ground left
+    \draw (PDR.S) node[ground] {}; % Ground right
+
+    % --- Buses & Peripherals ---
+    \draw[-] (-5.5, 5) -- (5.5, 5) node[midway, above] {WWL}; % Write Word Line
+    \draw (-4.8, 0) -- (-4.8, 3) node[above] {WBL};           % Write Bit Line Left
+    \draw (4.8, 0) -- (4.8, 3) node[above] {WBLB};            % Write Bit Line Right
+    \draw (6, 0) -- (6, -4) node[below] {RBL};                % Read Bit Line
+    \draw (-4.5, -4.8) -- (6.5, -4.8);                        % Read Word Line
+    \node at (0, -4.5) {RWL};                                 % RWL Label
+
+    % --- Pass Gate Wiring ---
+    \draw (WPGL.D) -- (Q);                                  % WPGL to Q
+    \draw (WPGL.S) -- (-4.8, 1.5) node[circ] {};            % WPGL to WBL
+    \draw (WPGL.G) -- (-3.4, 5) node[circ] {};              % WPGL Gate to WWL
+    \draw (WPGR.D) -- (QB);                                 % WPGR to QB
+    \draw (WPGR.S) -- (4.8, 1.5) node[circ] {};            % WPGR to WBLB
+    \draw (WPGR.G) -- (3.4, 5) node[circ] {};              % WPGR Gate to WWL
+    \draw (RPG.S) -- (NQB);                                 % RPG to NQB
+    \draw (RPG.D) -- (6, -1.5) node[circ] {};              % RPG to RBL
+    \draw (RPG.G) -- (4.6, -4.8) node[circ] {};            % RPG Gate to RWL
+
+    % --- SCL/SCR Control Lines ---
+    \draw (NSL.G) -- (-3.5, 0) -- (-3.5, -4) node[below] {SCL}; % SCL control
+    \draw (NSR.G) -- (3.5, 0) -- (3.5, -4) node[below] {SCR};   % SCR control
+
+    % ==========================================
+    % Phase 3: Labels & Annotations
+    % ==========================================
+    
+    % --- Node Annotations ---
+    \fill (Q) circle (2pt);  \node[right=0.15cm, above=0.05cm] at (Q) {Q};
+    \fill (NQ) circle (2pt); \node[right=0.1cm] at (NQ) {NQ};
+    \fill (QB) circle (2pt); \node[left=0.1cm] at (QB) {QB};
+    \fill (NQB) circle (2pt); \node[left=0.1cm] at (NQB) {NQB};
+
+    % --- Component Annotations ---
+    \node[left=0.05cm] at (PUL.center) {PUL};
+    \node[right=0.05cm] at (NSL.center) {NSL};
+    \node[left=0.05cm] at (PDL.center) {PDL};
+    \node[right=0.05cm] at (PUR.center) {PUR};
+    \node[left=0.2cm] at (NSR.center) {NSR};
+    \node[right=0.05cm] at (PDR.center) {PDR};
+    \node[below=0.2cm] at (WPGL.center) {WPGL};
+    \node[below=0.2cm] at (WPGR.center) {WPGR};
+    \node[above=0.05cm] at (RPG.center) {RPG};
+
+\end{circuitikz}
+\end{document}
