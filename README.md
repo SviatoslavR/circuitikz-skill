@@ -30,7 +30,7 @@ It solves the common pitfalls of AI-generated schematics, such as logical layout
 ## Structure
 
 - `SKILL.md`: The core system instruction. Feed this to any LLM as a System Prompt.
-- `examples/`: A showcase of reconstructed schematics (e.g., 9T SRAM) with source code and PDF output.
+- `examples/`: A showcase of reconstructed schematics (e.g., [9T SRAM](examples\example_9TSRAM.pdf)) with source code and PDF output.
 
 ## Quick Start
 
